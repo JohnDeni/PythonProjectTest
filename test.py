@@ -1,3 +1,7 @@
+
 word = input()
-words = lambda word: False if word[-1] != "!" else True
-print(words(word))
+if not word.strip():
+     raise ValueError("Error! The field cannot be empty.")
+else:
+    ends_with_exclamation = lambda x: word.endswith("!")
+    print(ends_with_exclamation(word))
