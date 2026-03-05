@@ -1,42 +1,42 @@
+from typing import TypedDict
+
+class Product(TypedDict):
+    name: str
+    price: float
 
 class Receipt:
 
-    def __init__(self, store_name, tax_percent):
+    def __init__(self, store_name: str, tax_percent: float) -> None:
         self.store_name = store_name
         self.tax_percent = tax_percent
-        self.products = []
+        self.products: list[Product] = []
 
-    def add_product(self, name, price):
-        if price > 0:
-            self.products.append({"name": name, "price": price})
-        else:
-            raise ValueError("Price is negative")
+    def add_product(self, name: str, price: float) -> None:
+        if not isinstance(price, (int, float)):
+            raise TypeError("Price must be a number")
+        if price <= 0:
+            raise ValueError("Price must be positive")
+
+        self.products.append({"name": name, "price": float(price)})
 
     def show_products(self):
         print(self.products)
 
-    def calculate_subtotal(self):
+    def calculate_subtotal(self) -> float:
 
-        total = 0
+        return sum(product["price"] for product in self.products)
 
-        for product in self.products:
-            total += product["price"]
-
-        return total
-
-    def calculate_tax(self):
+    def calculate_tax(self) -> float:
 
         subtotal = self.calculate_subtotal()
         tax_amount = subtotal * (self.tax_percent / 100)
         return round(tax_amount, 2)
 
-    def calculate_total(self):
+    def calculate_total(self) -> float:
 
-        total = self.calculate_subtotal() + self.calculate_tax()
+        return self.calculate_subtotal() + self.calculate_tax()
 
-        return total
-
-    def print_receipt(self):
+    def print_receipt(self) -> None:
         print("------ RECEIPT ------")
         print("Store:", self.store_name)
         print()
@@ -48,10 +48,10 @@ class Receipt:
 
         subtotal = self.calculate_subtotal()
         tax = self.calculate_tax()
-        total = subtotal + tax
+        total = self.calculate_total()
 
         print("Subtotal:", subtotal, "грн")
-        print(f"Tax ({self.tax_percent}%):", round(tax, 2),"грн")
+        print(f"Tax ({self.tax_percent}%):", "грн")
         print("Total:", total, "грн")
         print("---------------------")
 
