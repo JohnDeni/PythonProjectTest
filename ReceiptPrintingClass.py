@@ -9,7 +9,7 @@ class Receipt:
     def __init__(self, store_name: str, tax_percent: float) -> None:
         self.store_name = store_name
         self.tax_percent = tax_percent
-        self.products: list[Product] = []
+        self._products: list[Product] = []
 
     def add_product(self, name: str, price: float) -> None:
         if not isinstance(price, (int, float)):
@@ -17,14 +17,14 @@ class Receipt:
         if price <= 0:
             raise ValueError("Price must be positive")
 
-        self.products.append({"name": name, "price": float(price)})
+        self._products.append({"name": name, "price": float(price)})
 
     def show_products(self):
-        print(self.products)
+        print(self._products)
 
     def calculate_subtotal(self) -> float:
 
-        return sum(product["price"] for product in self.products)
+        return sum(product["price"] for product in self._products)
 
     def calculate_tax(self) -> float:
 
@@ -32,7 +32,7 @@ class Receipt:
         tax_amount = subtotal * (self.tax_percent / 100)
         return round(tax_amount, 2)
 
-    def calculate_total(self) -> float:
+    def __calculate_total(self) -> float:
 
         return self.calculate_subtotal() + self.calculate_tax()
 
@@ -41,17 +41,17 @@ class Receipt:
         print("Store:", self.store_name)
         print()
 
-        for product in self.products:
+        for product in self._products:
             print(f'{product["name"]:<10} {product["price"]:>5} грн')
 
         print()
 
         subtotal = self.calculate_subtotal()
         tax = self.calculate_tax()
-        total = self.calculate_total()
+        total = self.__calculate_total()
 
         print("Subtotal:", subtotal, "грн")
-        print(f"Tax ({self.tax_percent}%):", "грн")
+        print(f"Tax ({self.tax_percent}%): {tax} грн")
         print("Total:", total, "грн")
         print("---------------------")
 
