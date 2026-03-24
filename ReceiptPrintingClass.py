@@ -7,10 +7,18 @@ class Product(TypedDict):
 
 
 class Receipt:
-    def __init__(self, store_name: str, tax_percent: float) -> None:
+    def __init__(self, store_name: str, tax_percent: float = 20) -> None:
         self.store_name = store_name
         self.tax_percent = tax_percent
         self._products: list[Product] = []
+
+    def set_tax_percent(self, tax_percent: float) -> None:
+        if not isinstance(tax_percent, (int, float)):
+            raise TypeError("Tax percent must be a number")
+        if tax_percent < 0:
+            raise ValueError("Tax percent cannot be negative")
+
+        self.tax_percent = tax_percent
 
     def add_product(self, name: str, price: float) -> None:
         if not isinstance(price, (int, float)):
