@@ -9,16 +9,21 @@ class Product(TypedDict):
 class Receipt:
     def __init__(self, store_name: str, tax_percent: float = 20) -> None:
         self.store_name = store_name
-        self.tax_percent = tax_percent
+        self._tax_percent = tax_percent
         self._products: list[Product] = []
 
-    def set_tax_percent(self, tax_percent: float) -> None:
-        if not isinstance(tax_percent, (int, float)):
+    @property
+    def tax_percent(self) -> float:
+        return self._tax_percent
+
+    @tax_percent.setter
+    def tax_percent(self, value: float) -> None:
+        if not isinstance(value, (int, float)):
             raise TypeError("Tax percent must be a number")
-        if tax_percent < 0:
+        if value < 0:
             raise ValueError("Tax percent cannot be negative")
 
-        self.tax_percent = tax_percent
+        self._tax_percent = value
 
     def add_product(self, name: str, price: float) -> None:
         if not isinstance(price, (int, float)):
@@ -30,14 +35,14 @@ class Receipt:
 
     @property
     def products(self) -> list[Product]:
-        return self._products.copy()
+        return self._products
 
     def calculate_subtotal(self) -> float:
         return sum(product["price"] for product in self._products)
 
     def calculate_tax(self) -> float:
         subtotal = self.calculate_subtotal()
-        return round(subtotal * (self.tax_percent / 100), 2)
+        return round(subtotal * (self._tax_percent / 100), 2)
 
     def calculate_total(self) -> float:
         return round(self.calculate_subtotal() + self.calculate_tax(), 2)
@@ -69,7 +74,8 @@ class Printer:
         print("---------------------")
 
 
-receipt = Receipt("АТБ", 20)
+receipt = Receipt("АТБ")
+receipt.tax_percent = 10
 
 receipt.add_product("Хліб", 25)
 receipt.add_product("Молоко", 40)
