@@ -37,15 +37,17 @@ class Receipt:
     def products(self) -> list[Product]:
         return self._products
 
-    def calculate_subtotal(self) -> float:
+    @property
+    def subtotal(self) -> float:
         return sum(product["price"] for product in self._products)
 
-    def calculate_tax(self) -> float:
-        subtotal = self.calculate_subtotal()
-        return round(subtotal * (self._tax_percent / 100), 2)
+    @property
+    def tax(self) -> float:
+        return round(self.subtotal * (self._tax_percent / 100), 2)
 
-    def calculate_total(self) -> float:
-        return round(self.calculate_subtotal() + self.calculate_tax(), 2)
+    @property
+    def total(self) -> float:
+        return round(self.subtotal + self.tax, 2)
 
 
 class Printer:
@@ -64,14 +66,11 @@ class Printer:
 
         print()
 
-        subtotal = receipt.calculate_subtotal()
-        tax = receipt.calculate_tax()
-        total = receipt.calculate_total()
-
-        print(f"Subtotal: {subtotal:.2f} грн")
-        print(f"Tax ({receipt.tax_percent}%): {tax:.2f} грн")
-        print(f"Total: {total:.2f} грн")
+        print(f"Subtotal: {receipt.subtotal:.2f} грн")
+        print(f"Tax ({receipt.tax_percent}%): {receipt.tax:.2f} грн")
+        print(f"Total: {receipt.total:.2f} грн")
         print("---------------------")
+
 
 
 receipt = Receipt("АТБ")
