@@ -1,4 +1,5 @@
 from typing import TypedDict
+from abc import ABC, abstractmethod
 
 
 class Product(TypedDict):
@@ -50,7 +51,13 @@ class Receipt:
         return round(self.subtotal + self.tax, 2)
 
 
-class Printer:
+class BasePrinter(ABC):
+    @abstractmethod
+    def print_receipt(self, receipt: Receipt) -> None:
+        pass
+
+
+class BlackAndWhitePrinter(BasePrinter):
     def print_receipt(self, receipt: Receipt) -> None:
         print("------ RECEIPT ------")
         print(f"Store: {receipt.store_name}")
@@ -71,6 +78,32 @@ class Printer:
         print(f"Total: {receipt.total:.2f} грн")
         print("---------------------")
 
+class ColorPrinter(BasePrinter):
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    RESET = "\033[0m"
+
+    def print_receipt(self, receipt: Receipt) -> None:
+        print(self.GREEN + "------ RECEIPT ------" + self.RESET)
+        print(f"Store: {receipt.store_name}")
+        print()
+
+        if not receipt.products:
+            print(self.RED + "Чек порожній" + self.RESET)
+            print("---------------------")
+            return
+
+        for product in receipt.products:
+            print(f'{product["name"]:<15} {product["price"]:>7.2f} грн')
+
+        print()
+
+        print(f"Subtotal: {receipt.subtotal:.2f} грн")
+        print(self.RED + f"Tax ({receipt.tax_percent}%): {receipt.tax:.2f} грн" + self.RESET)
+        print(self.GREEN + f"Total: {receipt.total:.2f} грн" + self.RESET)
+        print("---------------------")
+
+
 
 
 receipt = Receipt("АТБ")
@@ -80,5 +113,8 @@ receipt.add_product("Хліб", 25)
 receipt.add_product("Молоко", 40)
 receipt.add_product("Пиво", 64)
 
-printer = Printer()
+printer: BasePrinter = BlackAndWhitePrinter()
+printer.print_receipt(receipt)
+
+printer: BasePrinter = ColorPrinter()
 printer.print_receipt(receipt)
